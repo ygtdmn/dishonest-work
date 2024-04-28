@@ -9,6 +9,6 @@ import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 contract Deploy is BaseScript {
     function run() public broadcast returns (DishonestWork dishonestWork) {
-        dishonestWork = new DishonestWork(IERC721(0x47f62429558cFfB91dbD1edF4f1e94F151091fb9)); // sepolia contract
+        dishonestWork = new DishonestWork(IERC721(0xCfED1cC741F68AF4778c2Eb8efDcFc0F9ab28466));
     }
 }

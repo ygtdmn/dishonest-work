@@ -43,43 +43,15 @@ contract DishonestTest is Test {
         honestWork.setApprovalForAll(address(dishonestWork), true);
     }
 
-    function test_Example() external {
+    function getCreationBytecode() external pure {
         bytes memory bytecode = abi.encodePacked(
             type(Depositor).creationCode,
-            abi.encode(ExampleERC721(0x47f62429558cFfB91dbD1edF4f1e94F151091fb9)),
-            abi.encode(address(0x9ca3817F2af1D53a221fCEE3e8C7473d4537A911))
+            abi.encode(ExampleERC721(0xCfED1cC741F68AF4778c2Eb8efDcFc0F9ab28466)),
+            abi.encode(address(0xAB120c9255281aC36b24a99fc64b5eb69D5aBe0c))
         );
         console2.logBytes(bytecode);
         console2.logBytes32(keccak256(bytecode));
     }
-
-    /*
-    makeYourOwnLuck
-    makeOriginNotSender
-    sendToAnEmptyAddress
-    transferXTimes
-    sendWithPassword
-
-    takeAVacation
-    startABeef
-    callABabe
-    goRaveTurnDeaf
-    overdoseAndGoDead
-    faceYourFears
-    goToAFancyRestaurantFeedYourself
-    snitchToFeds
-    shillScamTokenToYourFriendsBeBad
-
-    backToWork
-    endYourBeef
-    sayGoodbyeToBabe
-    goToDoctorHealDeaf
-    shotAdrenalineNoMoreDead
-    turnBackWithAHappyFace
-    returnHomeToFeedYourHead
-    returnFromFedsWithWitnessProtection
-    putAMiladyPfpNoMoreBad
-     */
 
     /*//////////////////////////////////////////////////////////////
                         FROM, TO ADDRESS CHECKS
