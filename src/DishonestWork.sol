@@ -42,12 +42,12 @@ contract DishonestWork is Ownable(msg.sender) {
         honestWork.transferFrom(msg.sender, to, tokenId);
     }
 
-    // You can also use this for TWICE_WITHIN_A_BLOCK and TO_CONTRACT
     function sendToAnEmptyAddress(uint256 tokenId) external {
         honestWork.transferFrom(msg.sender, address(this), tokenId);
         honestWork.transferFrom(address(this), msg.sender, tokenId);
     }
 
+    // You can also use this for TWICE_WITHIN_A_BLOCK and TO_CONTRACT
     function transferXTimes(uint256 tokenId, uint256 times) external {
         for (uint256 i = 0; i < times; i++) {
             if (i % 2 == 0) {
@@ -174,5 +174,15 @@ contract DishonestWork is Ownable(msg.sender) {
         feed = _feed;
         fed = _fed;
         bad = _bad;
+    }
+
+    fallback() external {
+        revert("You can't send ETH to this contract!");
+    }
+
+    // We have a withdraw function just in case someone finds a way to send ETH to this contract.
+    // ETH in this contract would break empty address task.
+    function withdraw() external {
+        payable(address(0x7d761D8828baf244eAC723F82b2ECE15ef8AdC4f)).transfer(address(this).balance);
     }
 }
