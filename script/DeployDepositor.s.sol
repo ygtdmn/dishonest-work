@@ -10,45 +10,45 @@ contract DeployDepositor is BaseScript {
     function run() public broadcast returns (Depositor depositor) {
         // sepolia contracts
         IERC721 honestWork = IERC721(0xCfED1cC741F68AF4778c2Eb8efDcFc0F9ab28466);
-        address dishonestWork = 0xAB120c9255281aC36b24a99fc64b5eb69D5aBe0c;
+        address dishonestWork = 0x0a78f07E560E81C9570F9013dbF4E77Fd1aa1E5f;
 
         // Create beef
-        depositor = new Depositor{ salt: 0x7d761d8828baf244eac723f82b2ece15ef8adc4f27231fc208eb0000000007c8 }(
+        depositor = new Depositor{ salt: 0x7d761d8828baf244eac723f82b2ece15ef8adc4ff20b5ff2bac30000000094f6 }(
             honestWork, dishonestWork
         );
 
         // Create babe
-        depositor = new Depositor{ salt: 0x7d761d8828baf244eac723f82b2ece15ef8adc4fa8751e65b21500000000c059 }(
+        depositor = new Depositor{ salt: 0x7d761d8828baf244eac723f82b2ece15ef8adc4f27bbae2541a8000000014f44 }(
             honestWork, dishonestWork
         );
 
         // Create deaf
-        depositor = new Depositor{ salt: 0x7d761d8828baf244eac723f82b2ece15ef8adc4f20e6b10e366f0000000049f7 }(
+        depositor = new Depositor{ salt: 0x7d761d8828baf244eac723f82b2ece15ef8adc4fe7d2adb053bc00000001339e }(
             honestWork, dishonestWork
         );
 
         // Create dead
-        depositor = new Depositor{ salt: 0x7d761d8828baf244eac723f82b2ece15ef8adc4f83ff5a5b7bd2000000003dfa }(
+        depositor = new Depositor{ salt: 0x7d761d8828baf244eac723f82b2ece15ef8adc4f91f422da618e0000000188ba }(
             honestWork, dishonestWork
         );
 
         // Create face
-        depositor = new Depositor{ salt: 0x7d761d8828baf244eac723f82b2ece15ef8adc4fdc30928a129100000002ac90 }(
+        depositor = new Depositor{ salt: 0x7d761d8828baf244eac723f82b2ece15ef8adc4f4c835bfafe5d00000001cc11 }(
             honestWork, dishonestWork
         );
 
         // Create feed
-        depositor = new Depositor{ salt: 0x7d761d8828baf244eac723f82b2ece15ef8adc4f453cb981b08d00000000be13 }(
+        depositor = new Depositor{ salt: 0x7d761d8828baf244eac723f82b2ece15ef8adc4f2b6da19824ba0000000002d5 }(
             honestWork, dishonestWork
         );
 
         // Create fed
-        depositor = new Depositor{ salt: 0x7d761d8828baf244eac723f82b2ece15ef8adc4f7c5d59c714b000000000f613 }(
+        depositor = new Depositor{ salt: 0x7d761d8828baf244eac723f82b2ece15ef8adc4fac797fe40060000001b1ff2a }(
             honestWork, dishonestWork
         );
 
         // Create bad
-        depositor = new Depositor{ salt: 0x7d761d8828baf244eac723f82b2ece15ef8adc4f317770be236b000000037b4c }(
+        depositor = new Depositor{ salt: 0x7d761d8828baf244eac723f82b2ece15ef8adc4f62e4d73bf63900000001647c }(
             honestWork, dishonestWork
         );
     }
