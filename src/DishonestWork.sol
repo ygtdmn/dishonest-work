@@ -2,6 +2,7 @@
 pragma solidity >=0.8.25;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 /*
@@ -21,8 +22,12 @@ contract DishonestWork is Ownable(msg.sender) {
     address public fed;
     address public bad;
 
-    constructor(IERC721 _honestWork) {
+    // failsafe withdraw address, can only withdraw orphan assets with no associated owner
+    address public withdrawAddress;
+
+    constructor(IERC721 _honestWork, address _withdrawAddress) {
         honestWork = _honestWork;
+        withdrawAddress = _withdrawAddress;
     }
 
     error DepositWithdrawFunctionsDoNotWorkBeforeOwnershipRenounce();
@@ -180,9 +185,36 @@ contract DishonestWork is Ownable(msg.sender) {
         revert("You can't send ETH to this contract!");
     }
 
+    /*//////////////////////////////////////////////////////////////
+                           FAILSAFE WITHDRAW
+    //////////////////////////////////////////////////////////////*/
+
+    // Admin withdraw only available as a failsafe. Can only withdraw orphan assets with no associated owner.
+
+    modifier onlyWithdrawAddress() {
+        require(msg.sender == withdrawAddress, "Only withdraw address");
+        _;
+    }
+
+    function setWithdrawAddress(address _newAddress) external onlyWithdrawAddress {
+        withdrawAddress = _newAddress;
+    }
+
     // We have a withdraw function just in case someone finds a way to send ETH to this contract.
     // ETH in this contract would break empty address task.
-    function withdraw() external {
-        payable(address(0x7d761D8828baf244eAC723F82b2ECE15ef8AdC4f)).transfer(address(this).balance);
+    function withdrawEth() external onlyWithdrawAddress {
+        payable(withdrawAddress).transfer(address(this).balance);
+    }
+
+    function withdrawErc20(IERC20 erc20) external onlyWithdrawAddress {
+        erc20.transfer(withdrawAddress, erc20.balanceOf(address(this)));
+    }
+
+    function withdrawErc721(IERC721 erc721, uint256 tokenId) external onlyWithdrawAddress {
+        if (erc721 == honestWork) {
+            require(ownerMap[tokenId] == address(0), "Owner exists");
+        }
+
+        erc721.transferFrom(address(this), withdrawAddress, tokenId);
     }
 }

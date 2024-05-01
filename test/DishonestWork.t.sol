@@ -6,14 +6,16 @@ import { console2 } from "forge-std/src/console2.sol";
 import { Depositor } from "../src/Depositor.sol";
 import { DishonestWork } from "../src/DishonestWork.sol";
 import { ExampleERC721 } from "./ExampleERC721.sol";
+import { ExampleERC20 } from "./ExampleERC20.sol";
 
 contract DishonestTest is Test {
     ExampleERC721 private honestWork;
     DishonestWork private dishonestWork;
+    address private withdrawAddress = 0x8C9A4427e991c6485e559E3c4F79a88128d8be3E;
 
     function setUp() public virtual {
         honestWork = new ExampleERC721();
-        dishonestWork = new DishonestWork(honestWork);
+        dishonestWork = new DishonestWork(honestWork, withdrawAddress);
         honestWork.setApprovalForAll(address(dishonestWork), true);
         dishonestWork.setAddresses(
             address(0xdead),
@@ -337,5 +339,74 @@ contract DishonestTest is Test {
         vm.stopBroadcast();
         vm.expectRevert("You are not the owner");
         dishonestWork.putAMiladyPfpNoMoreBad(1);
+    }
+
+    /*//////////////////////////////////////////////////////////////
+                         ADMIN WITHDRAW CHECKS
+    //////////////////////////////////////////////////////////////*/
+
+    function testWithdrawEthAdmin() external {
+        vm.deal(address(dishonestWork), 1 ether);
+        vm.deal(withdrawAddress, 1 ether);
+        vm.broadcast(withdrawAddress);
+        dishonestWork.withdrawEth();
+        assertEq(withdrawAddress.balance, 2 ether);
+    }
+
+    function testWithdrawEthNonAdmin() external {
+        vm.broadcast(address(0xdeadbeef));
+        vm.expectRevert("Only withdraw address");
+        dishonestWork.withdrawEth();
+    }
+
+    function testWithdrawErc20Admin() external {
+        ExampleERC20 erc20 = new ExampleERC20();
+        erc20.mint(address(dishonestWork), 100);
+        vm.broadcast(withdrawAddress);
+        dishonestWork.withdrawErc20(erc20);
+        assertEq(erc20.balanceOf(address(dishonestWork)), 0);
+        assertEq(erc20.balanceOf(withdrawAddress), 100);
+    }
+
+    function testWithdrawErc20NonAdmin() external {
+        ExampleERC20 erc20 = new ExampleERC20();
+        erc20.mint(address(dishonestWork), 100);
+        vm.broadcast(address(0xdeadbeef));
+        vm.expectRevert("Only withdraw address");
+        dishonestWork.withdrawErc20(erc20);
+    }
+
+    function testWithdrawErc721Admin() external {
+        ExampleERC721 erc721 = new ExampleERC721();
+        erc721.mint(address(dishonestWork), 1);
+        vm.broadcast(withdrawAddress);
+        dishonestWork.withdrawErc721(erc721, 1);
+        assertEq(erc721.ownerOf(1), withdrawAddress);
+    }
+
+    function testWithdrawErc721NonAdmin() external {
+        ExampleERC721 erc721 = new ExampleERC721();
+        erc721.mint(address(dishonestWork), 1);
+        vm.broadcast(address(0xdeadbeef));
+        vm.expectRevert("Only withdraw address");
+        dishonestWork.withdrawErc721(erc721, 1);
+    }
+
+    function testWithdrawHonestWorkAdmin() external {
+        dishonestWork.renounceOwnership();
+        honestWork.mint(address(this), 1);
+        dishonestWork.takeAVacation(1);
+        vm.broadcast(withdrawAddress);
+        vm.expectRevert("Owner exists");
+        dishonestWork.withdrawErc721(honestWork, 1);
+    }
+
+    function testWithdrawHonestWorkOwnedNonAdmin() external {
+        dishonestWork.renounceOwnership();
+        honestWork.mint(address(this), 1);
+        dishonestWork.takeAVacation(1);
+        vm.expectRevert("Only withdraw address");
+        vm.broadcast(address(this));
+        dishonestWork.withdrawErc721(honestWork, 1);
     }
 }
