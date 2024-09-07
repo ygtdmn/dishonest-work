@@ -2,15 +2,19 @@
 pragma solidity >=0.8.25;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@balancer-labs/v2-interfaces/contracts/vault/IVault.sol";
+import "@balancer-labs/v2-interfaces/contracts/vault/IFlashLoanRecipient.sol";
+import "@balancer-labs/v2-interfaces/contracts/solidity-utils/misc/IWETH.sol";
 
 /*
     * @title DishonestWork
     * @dev https://twitter.com/YigitDuman/status/1783450725588111550
     * @author Yigit Duman (@yigitduman)
+    * @custom:version v4
+    * @custom.changelog Added flash loan functionality (sendWithFakeRolex)
 */
-contract DishonestWork is Ownable(msg.sender) {
+contract DishonestWork is Ownable(msg.sender), IFlashLoanRecipient {
     IERC721 public honestWork;
 
     address public beef;
@@ -25,9 +29,15 @@ contract DishonestWork is Ownable(msg.sender) {
     // failsafe withdraw address, can only withdraw orphan assets with no associated owner
     address public withdrawAddress;
 
-    constructor(IERC721 _honestWork, address _withdrawAddress) {
+    // balancer vault
+    IVault private vault;
+    IWETH public weth;
+
+    constructor(IERC721 _honestWork, address _withdrawAddress, address _vault) {
         honestWork = _honestWork;
         withdrawAddress = _withdrawAddress;
+        vault = IVault(_vault);
+        weth = vault.WETH();
     }
 
     error DepositWithdrawFunctionsDoNotWorkBeforeOwnershipRenounce();
@@ -181,8 +191,49 @@ contract DishonestWork is Ownable(msg.sender) {
         bad = _bad;
     }
 
+    /*//////////////////////////////////////////////////////////////
+                              FLASH LOANS
+    //////////////////////////////////////////////////////////////*/
+
+    function sendWithFakeRolex(uint256 tokenId, uint256 ethAmount) external {
+        IERC20[] memory tokens = new IERC20[](1);
+        tokens[0] = weth;
+        uint256[] memory amounts = new uint256[](1);
+        amounts[0] = ethAmount;
+        bytes memory userData = abi.encode(msg.sender, tokenId);
+        deposit(tokenId, address(this));
+        vault.flashLoan(this, tokens, amounts, userData);
+    }
+
+    function receiveFlashLoan(
+        IERC20[] memory,
+        uint256[] memory amounts,
+        uint256[] memory,
+        bytes memory userData
+    )
+        external
+        override
+    {
+        require(msg.sender == address(vault));
+        (address sender, uint256 tokenId) = abi.decode(userData, (address, uint256));
+        weth.withdraw(amounts[0]);
+        honestWork.transferFrom(address(this), sender, tokenId);
+        ownerMap[tokenId] = address(0);
+        weth.deposit{ value: amounts[0] }();
+        weth.transfer(address(vault), amounts[0]);
+    }
+
     fallback() external {
-        revert("You can't send ETH to this contract!");
+        if (msg.sender != address(vault) && msg.sender != address(weth)) {
+            revert("You can't send ETH to this contract!");
+        }
+    }
+
+    // Function to receive ETH when unwrapping WETH
+    receive() external payable {
+        if (msg.sender != address(vault) && msg.sender != address(weth)) {
+            revert("You can't send ETH to this contract!");
+        }
     }
 
     /*//////////////////////////////////////////////////////////////

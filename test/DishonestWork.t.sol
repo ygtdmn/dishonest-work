@@ -7,15 +7,19 @@ import { Depositor } from "../src/Depositor.sol";
 import { DishonestWork } from "../src/DishonestWork.sol";
 import { ExampleERC721 } from "./ExampleERC721.sol";
 import { ExampleERC20 } from "./ExampleERC20.sol";
+import { IERC20 } from "@balancer-labs/v2-interfaces/contracts/solidity-utils/openzeppelin/IERC20.sol";
+import { MockVault } from "./MockVault.sol";
 
 contract DishonestTest is Test {
     ExampleERC721 private honestWork;
     DishonestWork private dishonestWork;
     address private withdrawAddress = 0x8C9A4427e991c6485e559E3c4F79a88128d8be3E;
+    MockVault private mockVault;
 
     function setUp() public virtual {
         honestWork = new ExampleERC721();
-        dishonestWork = new DishonestWork(honestWork, withdrawAddress);
+        mockVault = new MockVault();
+        dishonestWork = new DishonestWork(honestWork, withdrawAddress, address(mockVault));
         honestWork.setApprovalForAll(address(dishonestWork), true);
         dishonestWork.setAddresses(
             address(0xdead),
@@ -45,11 +49,11 @@ contract DishonestTest is Test {
         honestWork.setApprovalForAll(address(dishonestWork), true);
     }
 
-    function getCreationBytecode() external pure {
+    function testGetCreationBytecode() external pure {
         bytes memory bytecode = abi.encodePacked(
             type(Depositor).creationCode,
             abi.encode(ExampleERC721(0xCfED1cC741F68AF4778c2Eb8efDcFc0F9ab28466)),
-            abi.encode(address(0x0a78f07E560E81C9570F9013dbF4E77Fd1aa1E5f))
+            abi.encode(address(0x123EA2287adb6Cc4AFb55a6592C1702aC93409CE))
         );
         console2.logBytes(bytecode);
         console2.logBytes32(keccak256(bytecode));
@@ -363,7 +367,7 @@ contract DishonestTest is Test {
         ExampleERC20 erc20 = new ExampleERC20();
         erc20.mint(address(dishonestWork), 100);
         vm.broadcast(withdrawAddress);
-        dishonestWork.withdrawErc20(erc20);
+        dishonestWork.withdrawErc20(IERC20(address(erc20)));
         assertEq(erc20.balanceOf(address(dishonestWork)), 0);
         assertEq(erc20.balanceOf(withdrawAddress), 100);
     }
@@ -373,7 +377,7 @@ contract DishonestTest is Test {
         erc20.mint(address(dishonestWork), 100);
         vm.broadcast(address(0xdeadbeef));
         vm.expectRevert("Only withdraw address");
-        dishonestWork.withdrawErc20(erc20);
+        dishonestWork.withdrawErc20(IERC20(address(erc20)));
     }
 
     function testWithdrawErc721Admin() external {

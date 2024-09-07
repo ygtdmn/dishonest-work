@@ -6,25 +6,25 @@ A helper smart contract for [Honest Work by @0xShiroi](https://honestwork.0xfff.
 ## Deployed Addresses:
 
 **Ethereum Mainnet:**
-[0xAB120c9255281aC36b24a99fc64b5eb69D5aBe0c](https://etherscan.io/address/0xab120c9255281ac36b24a99fc64b5eb69d5abe0c)
-
-**Ethereum Sepolia:**
-[0x9ca3817f2af1d53a221fcee3e8c7473d4537a911](https://sepolia.etherscan.io/address/0x9ca3817f2af1d53a221fcee3e8c7473d4537a911)
+[0x123EA2287adb6Cc4AFb55a6592C1702aC93409CE](https://etherscan.io/address/0x123EA2287adb6Cc4AFb55a6592C1702aC93409CE)
 
 ## Depositor Addresses
 
-**Beef:** 0xBeEF61A3e97439934d58835b0Acd638F66e35A47
+**Beef:** 0x8873A37f142694320259fd1C19dEB72Ca1FaBeEF
 
-**Babe:** 0xbAbeBB5c4B6a65B774fe37dd4a8549C92D895E38
+**Babe:** 0x45E8346cCaE1B07C4089e2Ec7126befe9bA0baBE
 
-**Deaf:** 0xdeAf8F7461673a3a8aa4D2d79AEAbA0E9D78D0D7
+**Deaf:** 0x2073b7F273dFC2d76457986aE53f91977CC3deaf
 
-**Dead:** 0xDeAd0197F711f7D7BC4f984cd9CEa45965d2cf4D
+**Dead:** 0x941A5eBCba1d71c81582723146cA859C0E11DeAD
 
-**Face:** 0xfAce61651f81a76E632E9c1e9C71A11255337e6b
+**Face:** 0x8c45E474937A89419eB7aadf38202E32e666facE
 
-**Feed:** 0xFeED4bFB2CFE45B7bB292ce8d2d6690E7d561337
+**Feed:** 0xfb7F70cc9a3468573c2Daa7A0C98C15Bf0BafEeD
 
-**Fed:** 0xFED0AC853c751A407AB37a52920435CD70F22C67
+**Fed:** 0x5DfF4b9FC610a0fAAB68c03ed573f8AE4c201FEd
 
-**Bad:** 0xbad086aB920AE3e66bD92799D525A8C29B9Ca4cb
+**Bad:** 0x4962B3F71c88C4611662A682EDf57766cef01bAd
+
+## How to Mine Vanity Addresses?
+`cast create2 --caller 0x7d761D8828baf244eAC723F82b2ECE15ef8AdC4f --init-code-hash 0x98f26bb1ed06f9be4755f242e855fb7477175f50a4e959fba8fd6d6a3d768f5a --ends-with beef`
