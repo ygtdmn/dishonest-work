@@ -11,10 +11,11 @@ optimizer = true
 optimizer_runs = 10_000
 out = "out"
 script = "script"
-solc = "0.8.25"
+solc = "0.8.27"
 src = "src"
 test = "test"
 always_use_create_2_factory = true
+via_ir = true
 
 [profile.ci]
 fuzz = { runs = 10_000 }

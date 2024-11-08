@@ -1,10 +1,10 @@
 {
-  "name": "@prb/foundry-template",
-  "description": "Foundry-based template for developing Solidity smart contracts",
+  "name": "@ygtdmn/dishonest-work",
+  "description": "A helper smart contract for Honest Work by @0xShiroi made by Yigit Duman.",
   "version": "1.0.0",
   "author": {
-    "name": "Paul Razvan Berg",
-    "url": "https://github.com/PaulRBerg"
+    "name": "ygtdmn",
+    "url": "https://github.com/ygtdmn"
   },
   "dependencies": {
     "@balancer-labs/v2-vault": "^3.0.1",

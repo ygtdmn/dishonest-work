@@ -238,7 +238,7 @@ contract DishonestTest is Test {
     }
 
     function testDepositBeforeRenounceOwnershipFails() external {
-        vm.expectRevert(DishonestWork.DepositWithdrawFunctionsDoNotWorkBeforeOwnershipRenounce.selector);
+        vm.expectRevert("Deposit functions do not work before ownership is renounced");
         dishonestWork.takeAVacation(0);
     }
 
@@ -412,5 +412,102 @@ contract DishonestTest is Test {
         vm.expectRevert("Only withdraw address");
         vm.broadcast(address(this));
         dishonestWork.withdrawErc721(honestWork, 1);
+    }
+
+    /*//////////////////////////////////////////////////////////////
+                         UTILITY FUNCTION TESTS
+    //////////////////////////////////////////////////////////////*/
+
+    function testGetAllDepositedTokens() external {
+        dishonestWork.renounceOwnership();
+
+        // Mint and deposit tokens to different addresses
+        honestWork.mint(address(this), 1);
+        honestWork.mint(address(this), 2);
+        honestWork.mint(address(this), 3);
+
+        dishonestWork.takeAVacation(1); // to contract
+        dishonestWork.startABeef(2); // to beef
+        dishonestWork.callABabe(3); // to babe
+
+        uint256[] memory allTokens = dishonestWork.getAllDepositedTokens();
+
+        // Should have 3 tokens
+        assertEq(allTokens.length, 3);
+
+        // Verify the tokens are in the returned array
+        bool found1 = false;
+        bool found2 = false;
+        bool found3 = false;
+
+        for (uint256 i = 0; i < allTokens.length; i++) {
+            if (allTokens[i] == 1) found1 = true;
+            if (allTokens[i] == 2) found2 = true;
+            if (allTokens[i] == 3) found3 = true;
+        }
+
+        assertTrue(found1 && found2 && found3, "Not all deposited tokens were returned");
+    }
+
+    function testGetDepositedTokensForUser() external {
+        dishonestWork.renounceOwnership();
+
+        // Setup test with multiple users
+        address user1 = address(this);
+        address user2 = address(0x123);
+
+        // Mint tokens to both users
+        honestWork.mint(user1, 1);
+        honestWork.mint(user1, 2);
+        honestWork.mint(user2, 3);
+
+        // User1 deposits their tokens
+        dishonestWork.takeAVacation(1);
+        dishonestWork.startABeef(2);
+
+        // User2 deposits their token
+        vm.startBroadcast(user2);
+        honestWork.setApprovalForAll(address(dishonestWork), true);
+        dishonestWork.callABabe(3);
+        vm.stopBroadcast();
+
+        // Check user1's deposited tokens
+        uint256[] memory user1Tokens = dishonestWork.getDepositedTokens(user1);
+        assertEq(user1Tokens.length, 2);
+
+        bool found1 = false;
+        bool found2 = false;
+
+        for (uint256 i = 0; i < user1Tokens.length; i++) {
+            if (user1Tokens[i] == 1) found1 = true;
+            if (user1Tokens[i] == 2) found2 = true;
+        }
+
+        assertTrue(found1 && found2, "Not all user1 tokens were returned");
+
+        // Check user2's deposited tokens
+        uint256[] memory user2Tokens = dishonestWork.getDepositedTokens(user2);
+        assertEq(user2Tokens.length, 1);
+        assertEq(user2Tokens[0], 3);
+    }
+
+    function testGetDepositedTokensEmptyForNonUser() external {
+        dishonestWork.renounceOwnership();
+
+        // Check tokens for an address that hasn't deposited anything
+        uint256[] memory tokens = dishonestWork.getDepositedTokens(address(0xdead));
+        assertEq(tokens.length, 0);
+    }
+
+    function testGetAllDepositedTokensAfterWithdraw() external {
+        dishonestWork.renounceOwnership();
+
+        // Deposit and then withdraw tokens
+        honestWork.mint(address(this), 1);
+        dishonestWork.takeAVacation(1);
+        dishonestWork.backToWork(1);
+
+        uint256[] memory allTokens = dishonestWork.getAllDepositedTokens();
+        assertEq(allTokens.length, 0, "Should have no tokens after withdrawal");
     }
 }
