@@ -2,9 +2,9 @@
 
 [profile.default]
 auto_detect_solc = false
-block_timestamp = 1_680_220_800    # March 31, 2023 at 00:00 GMT
+block_timestamp = 1_680_220_800                     # March 31, 2023 at 00:00 GMT
 bytecode_hash = "none"
-evm_version = "shanghai"              # See https://www.evmdiff.com/features?name=PUSH0&kind=opcode
+evm_version = "shanghai"                            # See https://www.evmdiff.com/features?name=PUSH0&kind=opcode
 fuzz = { runs = 1_000 }
 gas_reports = ["*"]
 optimizer = true
@@ -15,7 +15,9 @@ solc = "0.8.27"
 src = "src"
 test = "test"
 always_use_create_2_factory = true
-via_ir = true
+via_ir = false
+fs_permissions = [{ access = "read", path = "./" }]
+ffi = true
 
 [profile.ci]
 fuzz = { runs = 10_000 }
@@ -45,4 +47,4 @@ localhost = "http://localhost:8545"
 mainnet = "https://eth-mainnet.g.alchemy.com/v2/${API_KEY_ALCHEMY}"
 optimism = "https://optimism-mainnet.infura.io/v3/${API_KEY_INFURA}"
 polygon = "https://polygon-mainnet.infura.io/v3/${API_KEY_INFURA}"
-sepolia = "https://sepolia.infura.io/v3/${API_KEY_INFURA}"
+sepolia = "https://eth-sepolia.g.alchemy.com/v2/${API_KEY_ALCHEMY}"

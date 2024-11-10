@@ -26,5 +26,11 @@ A helper smart contract for [Honest Work by @0xShiroi](https://honestwork.0xfff.
 
 **Bad:** 0x4962B3F71c88C4611662A682EDf57766cef01bAd
 
+## Deployment
+
+`forge script script/Deploy.s.sol --rpc-url sepolia --broadcast --verify`
+`forge script script/DeployDepositor.s.sol --rpc-url sepolia --broadcast --verify`
+
 ## How to Mine Vanity Addresses?
-`cast create2 --caller 0x7d761D8828baf244eAC723F82b2ECE15ef8AdC4f --init-code-hash 0x98f26bb1ed06f9be4755f242e855fb7477175f50a4e959fba8fd6d6a3d768f5a --ends-with beef`
+
+`forge script script/CalculateInitCodeHash.s.sol | grep "initCodeHash: " | awk '{print $3}' | xargs -I {} cast create2 --caller 0x28996f7DECe7E058EBfC56dFa9371825fBfa515A --init-code-hash {} --ends-with beef`

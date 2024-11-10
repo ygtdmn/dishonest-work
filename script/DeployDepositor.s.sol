@@ -5,102 +5,80 @@ import { Depositor } from "../src/Depositor.sol";
 import { BaseScript } from "./Base.s.sol";
 import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import { DishonestWork } from "../src/DishonestWork.sol";
+import { stdJson } from "forge-std/src/StdJson.sol";
 
 contract DeployDepositor is BaseScript {
-    function run() public broadcast {
-        // mainnet contracts
+    using stdJson for string;
+
+    function getMainnetContracts() internal pure returns (IERC721, DishonestWork) {
         IERC721 honestWork = IERC721(0xCfED1cC741F68AF4778c2Eb8efDcFc0F9ab28466);
         DishonestWork dishonestWork = DishonestWork(payable(address(0x123EA2287adb6Cc4AFb55a6592C1702aC93409CE)));
+        return (honestWork, dishonestWork);
+    }
 
-        // Create beef
-        Depositor beefDepositor = new Depositor{
-            salt: 0x7d761d8828baf244eac723f82b2ece15ef8adc4f9660afac20059ec573bb310b
-        }(honestWork, address(dishonestWork));
+    function getSepoliaContracts() internal pure returns (IERC721, DishonestWork) {
+        IERC721 honestWork = IERC721(0x47f62429558cFfB91dbD1edF4f1e94F151091fb9);
+        DishonestWork dishonestWork = DishonestWork(payable(address(0xCE409eBe4dC1933cf36b8025d23B4f5D698EB0A3)));
+        return (honestWork, dishonestWork);
+    }
 
-        require(
-            address(beefDepositor) == address(0x8873A37f142694320259fd1C19dEB72Ca1FaBeEF),
-            "Deployed Beef address does not match expected address"
-        );
+    function run() public broadcast {
+        // Get mainnet contracts
+        (IERC721 honestWork, DishonestWork dishonestWork) = getSepoliaContracts();
 
-        // Create babe
-        Depositor babeDepositor = new Depositor{
-            salt: 0x7d761d8828baf244eac723f82b2ece15ef8adc4f7b0849ed8630b86866e7c1bc
-        }(honestWork, address(dishonestWork));
+        string[] memory command = new string[](2);
+        command[0] = "python3";
+        command[1] = "script/generate_salts.py";
+        vm.ffi(command);
 
-        require(
-            address(babeDepositor) == address(0x45E8346cCaE1B07C4089e2Ec7126befe9bA0baBE),
-            "Deployed Babe address does not match expected address"
-        );
+        // Read salts from JSON
+        string memory root = vm.projectRoot();
+        string memory path = string.concat(root, "/script/salts.json");
+        string memory json = vm.readFile(path);
 
-        // Create deaf
-        Depositor deafDepositor = new Depositor{
-            salt: 0x7d761d8828baf244eac723f82b2ece15ef8adc4fb1335e5e3cf3d06a463ef8ab
-        }(honestWork, address(dishonestWork));
+        // Create all depositors
+        address[] memory addresses = new address[](8);
+        uint256 i = 0;
 
-        require(
-            address(deafDepositor) == address(0x2073b7F273dFC2d76457986aE53f91977CC3deaf),
-            "Deployed Deaf address does not match expected address"
-        );
+        string[] memory suffixes = new string[](8);
+        suffixes[0] = "beef";
+        suffixes[1] = "babe";
+        suffixes[2] = "deaf";
+        suffixes[3] = "dead";
+        suffixes[4] = "face";
+        suffixes[5] = "feed";
+        suffixes[6] = "fed";
+        suffixes[7] = "bad";
 
-        // Create dead
-        Depositor deadDepositor = new Depositor{
-            salt: 0x7d761d8828baf244eac723f82b2ece15ef8adc4f1d7551178af1421db2fa6a53
-        }(honestWork, address(dishonestWork));
+        for (i = 0; i < suffixes.length; i++) {
+            // Read directly using the suffix as the key
+            bytes32 salt = abi.decode(json.parseRaw(string.concat(".", suffixes[i], ".salt")), (bytes32));
 
-        require(
-            address(deadDepositor) == address(0x941A5eBCba1d71c81582723146cA859C0E11DeAD),
-            "Deployed Dead address does not match expected address"
-        );
+            Depositor depositor = new Depositor{ salt: salt }(honestWork, address(dishonestWork));
 
-        // Create face
-        Depositor faceDepositor = new Depositor{
-            salt: 0x7d761d8828baf244eac723f82b2ece15ef8adc4fe18a364d39708930d79f5c57
-        }(honestWork, address(dishonestWork));
+            addresses[i] = address(depositor);
 
-        require(
-            address(faceDepositor) == address(0x8c45E474937A89419eB7aadf38202E32e666facE),
-            "Deployed Face address does not match expected address"
-        );
+            // Verify address matches expected
+            address expectedAddr = abi.decode(json.parseRaw(string.concat(".", suffixes[i], ".address")), (address));
 
-        // Create feed
-        Depositor feedDepositor = new Depositor{
-            salt: 0x7d761d8828baf244eac723f82b2ece15ef8adc4f7740aa0305860754ff783828
-        }(honestWork, address(dishonestWork));
+            require(
+                address(depositor) == expectedAddr,
+                string.concat("Deployed ", suffixes[i], " address does not match expected address")
+            );
+        }
 
-        require(
-            address(feedDepositor) == address(0xfb7F70cc9a3468573c2Daa7A0C98C15Bf0BafEeD),
-            "Deployed Feed address does not match expected address"
-        );
-
-        // Create fed
-        Depositor fedDepositor = new Depositor{
-            salt: 0x7d761d8828baf244eac723f82b2ece15ef8adc4fe52f48e9ce4dcca945e41bd9
-        }(honestWork, address(dishonestWork));
-
-        require(
-            address(fedDepositor) == address(0x5DfF4b9FC610a0fAAB68c03ed573f8AE4c201FEd),
-            "Deployed Fed address does not match expected address"
-        );
-
-        // Create bad
-        Depositor badDepositor = new Depositor{
-            salt: 0x7d761d8828baf244eac723f82b2ece15ef8adc4fba7e7a23a760ea935e82f8d2
-        }(honestWork, address(dishonestWork));
-
-        require(
-            address(badDepositor) == address(0x4962B3F71c88C4611662A682EDf57766cef01bAd),
-            "Deployed Bad address does not match expected address"
-        );
-
+        // Set addresses in dishonestWork
         dishonestWork.setAddresses(
-            address(beefDepositor),
-            address(babeDepositor),
-            address(deafDepositor),
-            address(deadDepositor),
-            address(faceDepositor),
-            address(feedDepositor),
-            address(fedDepositor),
-            address(badDepositor)
+            addresses[0], // beef
+            addresses[1], // babe
+            addresses[2], // deaf
+            addresses[3], // dead
+            addresses[4], // face
+            addresses[5], // feed
+            addresses[6], // fed
+            addresses[7] // bad
         );
+
+        dishonestWork.renounceOwnership();
     }
 }
