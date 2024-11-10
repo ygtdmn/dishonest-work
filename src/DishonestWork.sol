@@ -6,6 +6,7 @@ import "@balancer-labs/v2-interfaces/contracts/vault/IVault.sol";
 import "@balancer-labs/v2-interfaces/contracts/vault/IFlashLoanRecipient.sol";
 import "@balancer-labs/v2-interfaces/contracts/solidity-utils/misc/IWETH.sol";
 import "./IHonestWork.sol";
+
 /**
  * @title DishonestWork
  * @notice A helper smart contract to assist/cheat with Honest Work by @0xShiroi tasks.
@@ -13,7 +14,6 @@ import "./IHonestWork.sol";
  * @custom:version v5
  * @custom:changelog Added utility functions to aid off-chain tools, added events, updated documentation.
  */
-
 contract DishonestWork is Ownable(msg.sender), IFlashLoanRecipient {
     IHonestWork public honestWork;
     IWETH public weth;
