@@ -483,58 +483,26 @@ contract DishonestWork is Ownable(msg.sender), IFlashLoanRecipient {
      * @return Array of all token IDs
      */
     function getAllDepositedTokens() public view returns (uint256[] memory) {
-        uint256[] memory allTokensOfThis = honestWork.tokensOf(address(this));
-        uint256[] memory allTokensOfBabe = honestWork.tokensOf(babe);
-        uint256[] memory allTokensOfDeaf = honestWork.tokensOf(deaf);
-        uint256[] memory allTokensOfDead = honestWork.tokensOf(dead);
-        uint256[] memory allTokensOfFace = honestWork.tokensOf(face);
-        uint256[] memory allTokensOfFeed = honestWork.tokensOf(feed);
-        uint256[] memory allTokensOfFed = honestWork.tokensOf(fed);
-        uint256[] memory allTokensOfBad = honestWork.tokensOf(bad);
-        uint256[] memory allTokensOfBeef = honestWork.tokensOf(beef);
+        address[9] memory addresses = [address(this), babe, deaf, dead, face, feed, fed, bad, beef];
 
-        uint256[] memory allTokens = new uint256[](
-            allTokensOfThis.length + allTokensOfBabe.length + allTokensOfDeaf.length + allTokensOfDead.length
-                + allTokensOfFace.length + allTokensOfFeed.length + allTokensOfFed.length + allTokensOfBad.length
-                + allTokensOfBeef.length
-        );
-        uint256 index = 0;
-        for (uint256 i = 0; i < allTokensOfThis.length; i++) {
-            allTokens[index] = allTokensOfThis[i];
-            index++;
+        // Get total length
+        uint256 totalLength;
+        for (uint256 i = 0; i < addresses.length; i++) {
+            totalLength += honestWork.tokensOf(addresses[i]).length;
         }
-        for (uint256 i = 0; i < allTokensOfBabe.length; i++) {
-            allTokens[index] = allTokensOfBabe[i];
-            index++;
+
+        uint256[] memory allTokens = new uint256[](totalLength);
+        uint256 index;
+
+        // Copy tokens from each address
+        for (uint256 i = 0; i < addresses.length; i++) {
+            uint256[] memory tokens = honestWork.tokensOf(addresses[i]);
+            for (uint256 j = 0; j < tokens.length; j++) {
+                allTokens[index] = tokens[j];
+                index++;
+            }
         }
-        for (uint256 i = 0; i < allTokensOfDeaf.length; i++) {
-            allTokens[index] = allTokensOfDeaf[i];
-            index++;
-        }
-        for (uint256 i = 0; i < allTokensOfDead.length; i++) {
-            allTokens[index] = allTokensOfDead[i];
-            index++;
-        }
-        for (uint256 i = 0; i < allTokensOfFace.length; i++) {
-            allTokens[index] = allTokensOfFace[i];
-            index++;
-        }
-        for (uint256 i = 0; i < allTokensOfFeed.length; i++) {
-            allTokens[index] = allTokensOfFeed[i];
-            index++;
-        }
-        for (uint256 i = 0; i < allTokensOfFed.length; i++) {
-            allTokens[index] = allTokensOfFed[i];
-            index++;
-        }
-        for (uint256 i = 0; i < allTokensOfBad.length; i++) {
-            allTokens[index] = allTokensOfBad[i];
-            index++;
-        }
-        for (uint256 i = 0; i < allTokensOfBeef.length; i++) {
-            allTokens[index] = allTokensOfBeef[i];
-            index++;
-        }
+
         return allTokens;
     }
 
