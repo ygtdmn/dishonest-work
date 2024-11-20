@@ -1,34 +1,34 @@
 {
   "beef": {
-    "address": "0x0E33182AA44e67ADE0b7229a3BB8Da968BcDbEeF",
-    "salt": "0x28996f7dece7e058ebfc56dfa9371825fbfa515a41e84142d86273d80dbf581a"
+    "address": "0x65fBfA0F880F1BF53933174EEFDCDE92567eBEeF",
+    "salt": "0x28996f7dece7e058ebfc56dfa9371825fbfa515a063dfff3a377a3771f22fc8b"
   },
   "babe": {
-    "address": "0x5AdC0a42e27D2d7F2E4282964cf80a49097bbaBe",
-    "salt": "0x28996f7dece7e058ebfc56dfa9371825fbfa515a8a7588dd6c84d2f8ec56f7ce"
+    "address": "0xD545b4b86115F3245cBc4bF8cfBaB99B6ecdbAbE",
+    "salt": "0x28996f7dece7e058ebfc56dfa9371825fbfa515ad1ce92b3ebcd0024d1443c42"
   },
   "deaf": {
-    "address": "0x69b8133cd92BbB35FD5866dDcC6F368007e6deAf",
-    "salt": "0x28996f7dece7e058ebfc56dfa9371825fbfa515aed9ba0fe98342b646d849660"
+    "address": "0x93A688E3dd60121b6Cbc941008858Bf39b33DeaF",
+    "salt": "0x28996f7dece7e058ebfc56dfa9371825fbfa515ad1bce9adffe5ea0228d10f79"
   },
   "dead": {
-    "address": "0x905A443cF242B7E5d665c6Fe9f2d64dCd187dEaD",
-    "salt": "0x28996f7dece7e058ebfc56dfa9371825fbfa515a09ac63d1d8bdaecbfd0c2317"
+    "address": "0xCA2d8A26ed0D2Caca892fD1B63B5dfE8d34DdEAD",
+    "salt": "0x28996f7dece7e058ebfc56dfa9371825fbfa515a7ea5bc551de71b763ed73f5c"
   },
   "face": {
-    "address": "0x44178951eAd525DF1F7351a8100F393666A7FACE",
-    "salt": "0x28996f7dece7e058ebfc56dfa9371825fbfa515a1182fbf02333d0efc250c52c"
+    "address": "0xA793C633ECAc90Dc9F0b10eA6279AA90B25FFaCe",
+    "salt": "0x28996f7dece7e058ebfc56dfa9371825fbfa515a01e4ed715ab3286c024d9641"
   },
   "feed": {
-    "address": "0x631E76CE66Ab8A670A96c8885330AE56038EfEed",
-    "salt": "0x28996f7dece7e058ebfc56dfa9371825fbfa515aef438df755d63a65cf4f147a"
+    "address": "0x3534da01447E0be8E847C71B87baff590Ee5fEed",
+    "salt": "0x28996f7dece7e058ebfc56dfa9371825fbfa515a2dfd6c07ce153af5ff0bf675"
   },
   "fed": {
-    "address": "0x093F151550B79cf996205E413344642588D89FED",
-    "salt": "0x28996f7dece7e058ebfc56dfa9371825fbfa515a4f45e5e19cf92232c9701ac8"
+    "address": "0x7d0e5333684872A4412650891474ad5185309feD",
+    "salt": "0x28996f7dece7e058ebfc56dfa9371825fbfa515a1f6c8d30255d16cfe7cbe592"
   },
   "bad": {
-    "address": "0xCB87c79cAF66973E495A63Fa52806AAcE2237Bad",
-    "salt": "0x28996f7dece7e058ebfc56dfa9371825fbfa515af323b8b40d52c55d2f9e418e"
+    "address": "0xF193531511609E7E4Ae47a3fa71bdB029c146bad",
+    "salt": "0x28996f7dece7e058ebfc56dfa9371825fbfa515a95bfa3a473b7b15d9a8a8327"
   }
 }

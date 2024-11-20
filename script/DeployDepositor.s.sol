@@ -18,7 +18,7 @@ contract DeployDepositor is BaseScript {
 
     function getSepoliaContracts() internal pure returns (IERC721, DishonestWork) {
         IERC721 honestWork = IERC721(0x47f62429558cFfB91dbD1edF4f1e94F151091fb9);
-        DishonestWork dishonestWork = DishonestWork(payable(address(0xCE409eBe4dC1933cf36b8025d23B4f5D698EB0A3)));
+        DishonestWork dishonestWork = DishonestWork(payable(address(0x3259577885133126E9576Dc9a8ddD5E244c7367C)));
         return (honestWork, dishonestWork);
     }
 
