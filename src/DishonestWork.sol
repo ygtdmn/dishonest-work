@@ -118,7 +118,7 @@ contract DishonestWork is Ownable(msg.sender), IFlashLoanRecipient {
      * @param source Address to withdraw from
      * @param msgSender Address of the sender
      */
-    function withdraw(uint256 tokenId, address source, address msgSender) internal {
+    function _withdraw(uint256 tokenId, address source, address msgSender) internal {
         require(ownerMap[tokenId] == msgSender, "You are not the owner");
         honestWork.transferFrom(source, msgSender, tokenId);
         ownerMap[tokenId] = address(0);
@@ -128,6 +128,62 @@ contract DishonestWork is Ownable(msg.sender), IFlashLoanRecipient {
     /*//////////////////////////////////////////////////////////////
                            PUBLIC FUNCTIONS
     //////////////////////////////////////////////////////////////*/
+
+    /**
+     * @notice Withdraws a token from a specific source address
+     * @param tokenId ID of the token to withdraw
+     * @param source Address to withdraw the token from
+     */
+    function withdraw(uint256 tokenId, address source) external {
+        _withdraw(tokenId, source, msg.sender);
+    }
+
+    /**
+     * @notice Withdraws a token from any special address where it's currently held
+     * @dev Checks all possible special addresses (this, beef, babe, etc.) to find the token
+     * @param tokenId ID of the token to withdraw
+     */
+    function withdraw(uint256 tokenId) public {
+        // Check each special address in sequence to find where the token is held
+        if (honestWork.ownerOf(tokenId) == address(this)) {
+            _withdraw(tokenId, address(this), msg.sender);
+        } else if (honestWork.ownerOf(tokenId) == beef) {
+            _withdraw(tokenId, beef, msg.sender);
+        } else if (honestWork.ownerOf(tokenId) == babe) {
+            _withdraw(tokenId, babe, msg.sender);
+        } else if (honestWork.ownerOf(tokenId) == deaf) {
+            _withdraw(tokenId, deaf, msg.sender);
+        } else if (honestWork.ownerOf(tokenId) == dead) {
+            _withdraw(tokenId, dead, msg.sender);
+        } else if (honestWork.ownerOf(tokenId) == face) {
+            _withdraw(tokenId, face, msg.sender);
+        } else if (honestWork.ownerOf(tokenId) == feed) {
+            _withdraw(tokenId, feed, msg.sender);
+        } else if (honestWork.ownerOf(tokenId) == fed) {
+            _withdraw(tokenId, fed, msg.sender);
+        } else if (honestWork.ownerOf(tokenId) == bad) {
+            _withdraw(tokenId, bad, msg.sender);
+        } else {
+            revert("Token not found in any special address");
+        }
+    }
+
+    /**
+     * @notice Withdraws all tokens that the caller has deposited
+     * @dev Uses getDepositedTokens to find all tokens owned by the caller
+     */
+    function withdrawAll() external {
+        uint256[] memory tokenIds = getDepositedTokens(msg.sender);
+        uint256 tokenIdsLength = tokenIds.length;
+
+        if (tokenIdsLength == 0) {
+            revert("No tokens deposited");
+        }
+
+        for (uint256 i = 0; i < tokenIdsLength; i++) {
+            withdraw(tokenIds[i]);
+        }
+    }
 
     /**
      * @notice Deposits token to this contract
@@ -142,7 +198,7 @@ contract DishonestWork is Ownable(msg.sender), IFlashLoanRecipient {
      * @param tokenId ID of the token to withdraw
      */
     function backToWork(uint256 tokenId) external {
-        withdraw(tokenId, address(this), msg.sender);
+        _withdraw(tokenId, address(this), msg.sender);
     }
 
     /**
@@ -158,7 +214,7 @@ contract DishonestWork is Ownable(msg.sender), IFlashLoanRecipient {
      * @param tokenId ID of the token to withdraw
      */
     function endYourBeef(uint256 tokenId) external {
-        withdraw(tokenId, beef, msg.sender);
+        _withdraw(tokenId, beef, msg.sender);
     }
 
     /**
@@ -174,7 +230,7 @@ contract DishonestWork is Ownable(msg.sender), IFlashLoanRecipient {
      * @param tokenId ID of the token to withdraw
      */
     function sayGoodbyeToBabe(uint256 tokenId) external {
-        withdraw(tokenId, babe, msg.sender);
+        _withdraw(tokenId, babe, msg.sender);
     }
 
     /**
@@ -190,7 +246,7 @@ contract DishonestWork is Ownable(msg.sender), IFlashLoanRecipient {
      * @param tokenId ID of the token to withdraw
      */
     function goToDoctorHealDeaf(uint256 tokenId) external {
-        withdraw(tokenId, deaf, msg.sender);
+        _withdraw(tokenId, deaf, msg.sender);
     }
 
     /**
@@ -206,7 +262,7 @@ contract DishonestWork is Ownable(msg.sender), IFlashLoanRecipient {
      * @param tokenId ID of the token to withdraw
      */
     function shotAdrenalineNoMoreDead(uint256 tokenId) external {
-        withdraw(tokenId, dead, msg.sender);
+        _withdraw(tokenId, dead, msg.sender);
     }
 
     /**
@@ -222,7 +278,7 @@ contract DishonestWork is Ownable(msg.sender), IFlashLoanRecipient {
      * @param tokenId ID of the token to withdraw
      */
     function turnBackWithAHappyFace(uint256 tokenId) external {
-        withdraw(tokenId, face, msg.sender);
+        _withdraw(tokenId, face, msg.sender);
     }
 
     /**
@@ -238,7 +294,7 @@ contract DishonestWork is Ownable(msg.sender), IFlashLoanRecipient {
      * @param tokenId ID of the token to withdraw
      */
     function returnHomeToFeedYourHead(uint256 tokenId) external {
-        withdraw(tokenId, feed, msg.sender);
+        _withdraw(tokenId, feed, msg.sender);
     }
 
     /**
@@ -254,7 +310,7 @@ contract DishonestWork is Ownable(msg.sender), IFlashLoanRecipient {
      * @param tokenId ID of the token to withdraw
      */
     function returnFromFedsWithWitnessProtection(uint256 tokenId) external {
-        withdraw(tokenId, fed, msg.sender);
+        _withdraw(tokenId, fed, msg.sender);
     }
 
     /**
@@ -270,7 +326,7 @@ contract DishonestWork is Ownable(msg.sender), IFlashLoanRecipient {
      * @param tokenId ID of the token to withdraw
      */
     function putAMiladyPfpNoMoreBad(uint256 tokenId) external {
-        withdraw(tokenId, bad, msg.sender);
+        _withdraw(tokenId, bad, msg.sender);
     }
 
     /**
@@ -371,7 +427,7 @@ contract DishonestWork is Ownable(msg.sender), IFlashLoanRecipient {
         require(msg.sender == address(vault));
         (address sender, uint256 tokenId) = abi.decode(userData, (address, uint256));
         weth.withdraw(amounts[0]);
-        withdraw(tokenId, address(this), sender);
+        _withdraw(tokenId, address(this), sender);
         weth.deposit{ value: amounts[0] }();
         weth.transfer(address(vault), amounts[0]);
     }
@@ -482,7 +538,7 @@ contract DishonestWork is Ownable(msg.sender), IFlashLoanRecipient {
      * @dev This function is intended to be used off-chain and not optimized.
      * @return Array of all token IDs
      */
-    function getAllDepositedTokens() public view returns (uint256[] memory) {
+    function getAllDepositedTokens() public view returns (uint256[] memory, address[] memory) {
         address[9] memory addresses = [address(this), babe, deaf, dead, face, feed, fed, bad, beef];
 
         // Get total length
@@ -492,6 +548,7 @@ contract DishonestWork is Ownable(msg.sender), IFlashLoanRecipient {
         }
 
         uint256[] memory allTokens = new uint256[](totalLength);
+        address[] memory owners = new address[](totalLength);
         uint256 index;
 
         // Copy tokens from each address
@@ -499,11 +556,12 @@ contract DishonestWork is Ownable(msg.sender), IFlashLoanRecipient {
             uint256[] memory tokens = honestWork.tokensOf(addresses[i]);
             for (uint256 j = 0; j < tokens.length; j++) {
                 allTokens[index] = tokens[j];
+                owners[index] = addresses[i];
                 index++;
             }
         }
 
-        return allTokens;
+        return (allTokens, owners);
     }
 
     /**
@@ -512,8 +570,8 @@ contract DishonestWork is Ownable(msg.sender), IFlashLoanRecipient {
      * @param user Address to check
      * @return Array of token IDs
      */
-    function getDepositedTokens(address user) external view returns (uint256[] memory) {
-        uint256[] memory allDepositedTokens = getAllDepositedTokens();
+    function getDepositedTokens(address user) public view returns (uint256[] memory) {
+        (uint256[] memory allDepositedTokens,) = getAllDepositedTokens();
 
         // First count matching tokens
         uint256 count = 0;

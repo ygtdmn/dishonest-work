@@ -431,23 +431,24 @@ contract DishonestTest is Test {
         dishonestWork.startABeef(2); // to beef
         dishonestWork.callABabe(3); // to babe
 
-        uint256[] memory allTokens = dishonestWork.getAllDepositedTokens();
+        (uint256[] memory allTokens, address[] memory locations) = dishonestWork.getAllDepositedTokens();
 
         // Should have 3 tokens
         assertEq(allTokens.length, 3);
+        assertEq(locations.length, 3);
 
-        // Verify the tokens are in the returned array
-        bool found1 = false;
-        bool found2 = false;
-        bool found3 = false;
-
+        // Verify the tokens and their locations
         for (uint256 i = 0; i < allTokens.length; i++) {
-            if (allTokens[i] == 1) found1 = true;
-            if (allTokens[i] == 2) found2 = true;
-            if (allTokens[i] == 3) found3 = true;
+            if (allTokens[i] == 1) {
+                assertEq(locations[i], address(dishonestWork));
+            } else if (allTokens[i] == 2) {
+                assertEq(locations[i], dishonestWork.beef());
+            } else if (allTokens[i] == 3) {
+                assertEq(locations[i], dishonestWork.babe());
+            } else {
+                assertTrue(false, "Unexpected token ID found");
+            }
         }
-
-        assertTrue(found1 && found2 && found3, "Not all deposited tokens were returned");
     }
 
     function testGetDepositedTokensForUser() external {
@@ -508,8 +509,9 @@ contract DishonestTest is Test {
         dishonestWork.takeAVacation(1);
         dishonestWork.backToWork(1);
 
-        uint256[] memory allTokens = dishonestWork.getAllDepositedTokens();
+        (uint256[] memory allTokens, address[] memory locations) = dishonestWork.getAllDepositedTokens();
         assertEq(allTokens.length, 0, "Should have no tokens after withdrawal");
+        assertEq(locations.length, 0, "Should have no locations after withdrawal");
     }
 
     function testSetWithdrawAddressFromNonWithdrawAddress() external {
@@ -590,9 +592,9 @@ contract DishonestTest is Test {
 
     function testGetAllDepositedTokensWithMaxTokens() external {
         dishonestWork.renounceOwnership();
-        uint256 numTokens = 100; // Large enough to test array handling but not too gas intensive
+        uint256 numTokens = 100;
 
-        // Mint and deposit many tokens starting from ID 1
+        // Mint and deposit many tokens
         for (uint256 i = 1; i <= numTokens; i++) {
             honestWork.mint(address(this), i);
             if (i % 8 == 0) dishonestWork.takeAVacation(i);
@@ -606,17 +608,31 @@ contract DishonestTest is Test {
         }
 
         // Get all deposited tokens
-        uint256[] memory allTokens = dishonestWork.getAllDepositedTokens();
+        (uint256[] memory allTokens, address[] memory locations) = dishonestWork.getAllDepositedTokens();
 
-        // Verify length
+        // Verify lengths
         assertEq(allTokens.length, numTokens);
+        assertEq(locations.length, numTokens);
 
-        // Verify all tokens are present
-        bool[] memory found = new bool[](numTokens + 1); // +1 to account for 1-based indexing
+        // Verify all tokens are present and at correct locations
+        bool[] memory found = new bool[](numTokens + 1);
         for (uint256 i = 0; i < allTokens.length; i++) {
             uint256 tokenId = allTokens[i];
             require(!found[tokenId], "Duplicate token found");
             found[tokenId] = true;
+
+            // Verify location matches expected deposit address
+            address expectedLocation;
+            if (tokenId % 8 == 0) expectedLocation = address(dishonestWork);
+            else if (tokenId % 8 == 1) expectedLocation = dishonestWork.beef();
+            else if (tokenId % 8 == 2) expectedLocation = dishonestWork.babe();
+            else if (tokenId % 8 == 3) expectedLocation = dishonestWork.deaf();
+            else if (tokenId % 8 == 4) expectedLocation = dishonestWork.dead();
+            else if (tokenId % 8 == 5) expectedLocation = dishonestWork.face();
+            else if (tokenId % 8 == 6) expectedLocation = dishonestWork.feed();
+            else expectedLocation = dishonestWork.fed();
+
+            assertEq(locations[i], expectedLocation, "Token in wrong location");
         }
 
         // Verify all tokens were found
@@ -705,13 +721,70 @@ contract DishonestTest is Test {
         assertEq(honestWork.ownerOf(5), users[4]);
 
         // Verify token mappings are cleared
-        uint256[] memory allTokens = dishonestWork.getAllDepositedTokens();
+        (uint256[] memory allTokens, address[] memory locations) = dishonestWork.getAllDepositedTokens();
         assertEq(allTokens.length, 0, "Not all tokens were withdrawn");
+        assertEq(locations.length, 0, "Not all locations were cleared");
 
         // Check individual user deposits are cleared
         for (uint256 i = 0; i < users.length; i++) {
             uint256[] memory userTokens = dishonestWork.getDepositedTokens(users[i]);
             assertEq(userTokens.length, 0, "User still has deposited tokens");
         }
+    }
+
+    function testWithdrawWithSourceAddress() external {
+        dishonestWork.renounceOwnership();
+
+        // Deposit token to beef address
+        dishonestWork.startABeef(0);
+        assertEq(honestWork.ownerOf(0), dishonestWork.beef());
+
+        // Withdraw using explicit source address
+        dishonestWork.withdraw(0, dishonestWork.beef());
+        assertEq(honestWork.ownerOf(0), address(this));
+    }
+
+    function testWithdrawAutoDetectSource() external {
+        dishonestWork.renounceOwnership();
+
+        // Deposit token to different addresses
+        dishonestWork.startABeef(0);
+        assertEq(honestWork.ownerOf(0), dishonestWork.beef());
+
+        // Withdraw without specifying source
+        dishonestWork.withdraw(0);
+        assertEq(honestWork.ownerOf(0), address(this));
+    }
+
+    function testWithdrawAllTokens() external {
+        dishonestWork.renounceOwnership();
+
+        // Mint additional tokens
+        honestWork.mint(address(this), 1);
+        honestWork.mint(address(this), 2);
+
+        // Deposit tokens to different addresses
+        dishonestWork.startABeef(0);
+        dishonestWork.callABabe(1);
+        dishonestWork.takeAVacation(2);
+
+        // Verify initial deposits
+        assertEq(honestWork.ownerOf(0), dishonestWork.beef());
+        assertEq(honestWork.ownerOf(1), dishonestWork.babe());
+        assertEq(honestWork.ownerOf(2), address(dishonestWork));
+
+        // Withdraw all tokens
+        dishonestWork.withdrawAll();
+
+        // Verify all tokens returned
+        assertEq(honestWork.ownerOf(0), address(this));
+        assertEq(honestWork.ownerOf(1), address(this));
+        assertEq(honestWork.ownerOf(2), address(this));
+    }
+
+    function testWithdrawAllWithNoTokens() external {
+        dishonestWork.renounceOwnership();
+        vm.expectRevert("No tokens deposited");
+        dishonestWork.withdrawAll();
     }
 }
