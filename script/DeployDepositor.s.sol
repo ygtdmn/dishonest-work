@@ -12,7 +12,7 @@ contract DeployDepositor is BaseScript {
 
     function getMainnetContracts() internal pure returns (IERC721, DishonestWork) {
         IERC721 honestWork = IERC721(0xCfED1cC741F68AF4778c2Eb8efDcFc0F9ab28466);
-        DishonestWork dishonestWork = DishonestWork(payable(address(0x123EA2287adb6Cc4AFb55a6592C1702aC93409CE)));
+        DishonestWork dishonestWork = DishonestWork(payable(address(0x943B541B49274Eb8845DC9BE200151289E5b820D)));
         return (honestWork, dishonestWork);
     }
 
@@ -24,7 +24,7 @@ contract DeployDepositor is BaseScript {
 
     function run() public broadcast {
         // Get mainnet contracts
-        (IERC721 honestWork, DishonestWork dishonestWork) = getSepoliaContracts();
+        (IERC721 honestWork, DishonestWork dishonestWork) = getMainnetContracts();
 
         string[] memory command = new string[](2);
         command[0] = "python3";
